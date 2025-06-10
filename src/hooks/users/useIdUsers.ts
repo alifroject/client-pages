@@ -13,7 +13,7 @@ export const useUsersId = (id: number | string, onSuccess?: () => void) => {
       if (!id) return;
       setLoading(true)
       try {
-        const res = await fetch(`/api/user/${id}`, {
+        const res = await fetch(`/api/user/byId/${id}`, {
           signal: abortController.signal
         })
         if (!res.ok) {

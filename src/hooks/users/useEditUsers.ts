@@ -3,7 +3,7 @@ import React, { useState } from "react";
 export function useEditUser(onSuccess?: () => void) {
     const [submittingEdit, setSubmitting] = useState(false)
     const [messageEdit, setMessage] = useState('')
-
+    const [error, setError] = useState('')
 
 
     const handleEdit = async (e: React.FormEvent, id: number, email: string, name: string) => {
@@ -12,28 +12,30 @@ export function useEditUser(onSuccess?: () => void) {
         setMessage('')
 
         try {
-            const res = await fetch('/api/user', {
-                method: 'PATCH',
+            const res = await fetch(`/api/user/updateUser/${id}`, {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, email, name }),
+                body: JSON.stringify({ email, name }),
             })
 
-            const data = await res.json()
 
-            if (res.ok) {
-                setMessage('User created')
-                onSuccess?.()
 
-            } else {
-                setMessage(data.error || 'Error occurred')
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Failed to update user');
             }
+            const data = await res.json();
+            setMessage('User updated successfully');
+            onSuccess?.();
+            return data;  // Return the updated user data
 
-        } catch {
-            setMessage('Something went wrong')
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
+            setMessage(errorMessage);
         } finally {
             setSubmitting(false)
         }
     }
 
-    return { handleEdit, messageEdit, submittingEdit }
+    return { handleEdit, messageEdit, submittingEdit, error };
 }
