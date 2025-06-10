@@ -36,6 +36,7 @@ export async function GET() {
 }
 
 
+
 export async function PATCH(req: Request) {
     const { id, name, email } = await req.json()
     if (!id) return NextResponse.json({ error: 'Email is required' }, { status: 400 })

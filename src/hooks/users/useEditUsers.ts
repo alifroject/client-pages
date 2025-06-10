@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
 export function useEditUser(onSuccess?: () => void) {
-    const [submitting, setSubmitting] = useState(false)
-    const [message, setMessage] = useState('')
+    const [submittingEdit, setSubmitting] = useState(false)
+    const [messageEdit, setMessage] = useState('')
 
 
 
@@ -35,5 +35,5 @@ export function useEditUser(onSuccess?: () => void) {
         }
     }
 
-    return { handleEdit, message, submitting }
+    return { handleEdit, messageEdit, submittingEdit }
 }
