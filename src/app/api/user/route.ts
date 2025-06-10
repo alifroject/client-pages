@@ -34,3 +34,19 @@ export async function GET() {
 
     }
 }
+
+
+export async function PATCH(req: Request) {
+    const { id, name, email } = await req.json()
+    if (!id) return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+    if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+    try {
+        const userUpdate = await prisma.user.update({
+            where: { id },
+            data: { email, name }
+        })
+        return NextResponse.json(userUpdate)
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+}
