@@ -2,48 +2,28 @@
 
 import { useState } from 'react'
 import { useUsers } from '@/hooks/useUsers'
+import { useCreateUser } from '@/hooks/useCreateUsers'
 
 export default function Home() {
   const { users, loading: userLoading, error, refetch } = useUsers()
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
-  const [message, setMessage] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const [, setFormReset] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitting(true)
-    setMessage('')
 
-    try {
-      const res = await fetch('/api/user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name }),
-      })
-
-      const data = await res.json()
-      if (res.ok) {
-        setMessage('User created')
-        setEmail('')
-        setName('')
-        refetch()
-      } else {
-        setMessage(data.error || 'Error occurred')
-      }
-    } catch {
-      setMessage('Something went wrong')
-    } finally {
-      setSubmitting(false)
-    }
-  }
+  const { handleSubmit, message, submitting } = useCreateUser(() => {
+    refetch()
+    setEmail('')
+    setName('')
+    setFormReset(true)
+  })
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full max-w-2xl">
         <h1 className="text-2xl font-bold">Create a User</h1>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-sm">
+        <form onSubmit={(e) => handleSubmit(e, name, email)} className="flex flex-col gap-4 w-full max-w-sm">
           <input
             type="email"
             placeholder="Email"
