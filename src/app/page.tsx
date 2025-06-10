@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useUsers } from '@/hooks/useUsers'
-import { useCreateUser } from '@/hooks/useCreateUsers'
+import { useUsers } from '@/hooks/users/useUsers'
+import { useCreateUser } from '@/hooks/users/useCreateUsers'
 
 export default function Home() {
   const { users, loading: userLoading, error, refetch } = useUsers()
