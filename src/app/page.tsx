@@ -4,17 +4,24 @@ import { useState, useEffect } from 'react'
 import { useUsers } from '@/hooks/users/useUsers'
 import { useCreateUser } from '@/hooks/users/useCreateUsers'
 import { useEditUser } from '@/hooks/users/useEditUsers'
+import { useDeleteUser } from '@/hooks/users/useDeleteUsers'
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-
+import { User } from '@/types/user'
 
 export default function Home() {
   const { users, loading: userLoading, error, refetch } = useUsers()
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [, setFormReset] = useState(false)
-
+  const [localUsers, setLocalUsers] = useState<User[]>([]);
   const router = useRouter();
+  const { users: initialUsers } = useUsers();
+  useEffect(() => {
+    if (initialUsers) {
+      setLocalUsers(initialUsers);
+    }
+  }, [initialUsers]);
 
 
   const { handleSubmit, message, submitting } = useCreateUser(() => {
@@ -23,12 +30,20 @@ export default function Home() {
     setName('')
     setFormReset(true)
   })
-  const { handleEdit, messageEdit, submittingEdit } = useEditUser(() => {
+  const { } = useEditUser(() => {
     refetch()
     setEmail('')
     setName('')
     setFormReset(true)
   })
+
+  const { handledelete, isDeleting, } = useDeleteUser(() => {
+    refetch(); // Refresh the user list after deletion
+    setEmail('')
+    setName('')
+    setFormReset(true)
+  });
+
 
 
   return (
@@ -83,7 +98,7 @@ export default function Home() {
                 <td colSpan={4} className="text-center py-4">Loading...</td>
               </tr>
             ) : (
-              users.map((user) => (
+              localUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="border px-3 py-2">{user.id}</td>
                   <td className="border px-3 py-2">{user.email}</td>
@@ -96,12 +111,13 @@ export default function Home() {
                     >
                       Edit
                     </Link>
-                    <Link
-                      href={`/delete-user/${user.id}`}
-                      className="inline-block px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200"
+                    <button
+                      onClick={() => handledelete(user.id, localUsers, setLocalUsers)}
+                      disabled={isDeleting}
+                      className="inline-block px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200 disabled:opacity-50"
                     >
-                      Delete
-                    </Link>
+                      {isDeleting ? 'Deleting...' : 'Delete'}
+                    </button>
                   </td>
 
                 </tr>
